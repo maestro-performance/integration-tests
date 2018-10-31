@@ -1,0 +1,10 @@
+version: '3.4'
+services:
+  sut:
+    image: maestro_test_rabbitmq
+    networks: 
+      - test
+    hostname: sut
+    ports:
+      - "15672:15672"
+      - "5672:5672"
