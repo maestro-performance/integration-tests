@@ -42,6 +42,7 @@ services:
         - broker
   reports:
     image: maestroperf/maestro-reports:edge
+    hostname: reports
     networks:
       - cluster
     ports:
