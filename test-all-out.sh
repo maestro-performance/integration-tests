@@ -1,5 +1,9 @@
 ############## ALl out ###########################
 
+function cleanup() {
+    docker rmi -f maestro_sut  || true
+}
+
 # Artemis 2.6
 function testArtemis() {
     echo "Launching a SUT instance w/ Apache Artemis"
@@ -7,7 +11,7 @@ function testArtemis() {
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Artemis 2.6.3" maestro-test-client /usr/bin/test-runner-all-out.sh
     sleep 30s
     docker-compose -f docker-compose.yml -f suts/docker-artemis-compose.yml down
-    docker rmi -f maestro_sut  || true
+    cleanup
 }
 
 
@@ -19,7 +23,7 @@ function testIbmMqLight() {
     docker run -it -h maestro_test_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="IBM MQ Light" maestro-test-client /usr/bin/test-runner-all-out.sh
     sleep 30s
     docker-compose -f docker-compose.yml -f docker-ibmmqlight-compose.yml down
-    docker rmi -f maestro_sut  || true
+    cleanup
 }
 
 
@@ -31,7 +35,7 @@ function testActiveMQ() {
     docker run -it -h maestro_test_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="ActiveMQ 5.15.2" maestro-test-client /usr/bin/test-runner-all-out.sh
     sleep 30s
     docker-compose -f docker-compose.yml -f suts/docker-activemq-compose.yml down
-    docker rmi -f maestro_sut  || true
+    cleanup
 }
 
 # Interconnect
@@ -41,7 +45,7 @@ function testQpidDispatch() {
     docker run -it -h maestro_test_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Interconnect 1.4.0" maestro-test-client /usr/bin/test-runner-all-out.sh
     sleep 90s
     docker-compose -f docker-compose.yml -f suts/docker-interconnect-compose.yml down
-    docker rmi -f maestro_sut  || true
+    cleanup
 }
 
 # QpidCPP
@@ -53,7 +57,7 @@ function testQpidCpp() {
     docker run -it --network=work_cluster -e PRODUCT_NAME="QPid CPP" maestro-test-client /usr/bin/test-runner-all-out.sh
     sleep 90s
     docker-compose -f docker-compose.yml -f suts/docker-interconnect-compose.yml down
-    docker rmi -f maestro_sut  || true
+    cleanup
 }
 
 # RabbitMQ
@@ -66,7 +70,7 @@ function testRabbitMq() {
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="RabbitMQ" -e SEND_RECEIVE_URL="amqp://sut:5672/test.performance.queue?protocol=RABBITAMQP" maestro-test-client /usr/bin/test-runner-all-out.sh
     sleep 30s
     docker-compose -f docker-compose.yml -f suts/docker-rabbitmq-compose.yml down
-    # docker rmi -f maestro_sut  || true
+    cleanup
 }
 
 case "${1}" in

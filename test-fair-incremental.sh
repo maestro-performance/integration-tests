@@ -1,3 +1,9 @@
+#!/bin/bash
+
+function cleanup() {
+    docker rmi -f maestro_sut  || true
+}
+
 # MQ Light
 function testIbmMqLight() {
     wget -c https://gist.githubusercontent.com/orpiske/43574edf7c6c3ef150550c70820c25b8/raw/21def540f911ac8bdbfe9bd899521e924a76c018/docker-ibmmqlight-compose.yml -O suts/docker-ibmmqlight-compose.yml
@@ -5,7 +11,7 @@ function testIbmMqLight() {
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="IBM MQ Light" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     sleep 30s
     docker-compose -f docker-compose.yml -f suts/docker-ibmmqlight-compose.yml down
-    docker rmi -f maestro_sut || true
+    cleanup
 }
 
 
@@ -15,7 +21,7 @@ function testArtemis() {
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Artemis 2.6.3" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     sleep 30s
     docker-compose -f docker-compose.yml -f suts/docker-artemis-compose.yml down
-    docker rmi -f maestro_sut || true
+    cleanup
 }
 
 
@@ -25,7 +31,7 @@ function testActiveMQ() {
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="ActiveMQ 5.15.2" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     sleep 30s
     docker-compose -f docker-compose.yml -f suts/docker-activemq-compose.yml down
-    docker rmi -f maestro_sut || true
+    cleanup
 }
 
 
@@ -35,7 +41,7 @@ function testQpidDispatch() {
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Interconnect 1.4.0" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     sleep 90s
     docker-compose -f docker-compose.yml -f suts/docker-interconnect-compose.yml down
-    docker rmi -f maestro_sut || true
+    cleanup
 }
 
 # QpidCpp
@@ -47,7 +53,7 @@ function testQpidCpp() {
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Qpid CPP" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     sleep 90s
     docker-compose -f docker-compose.yml -f suts/docker-interconnect-compose.yml down
-    docker rmi -f maestro_sut || true
+    cleanup
 }
 
 
@@ -61,9 +67,10 @@ function testRabbitMq() {
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="RabbitMQ" -e SEND_RECEIVE_URL="amqp://sut:5672/test.performance.queue?protocol=RABBITAMQP" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     sleep 30s
     docker-compose -f docker-compose.yml -f suts/docker-rabbitmq-compose.yml down
-    docker rmi -f maestro_sut || true
+    cleanup
 }
 
+trap cleanup SIGTERM SIGINT
 
 case "${1}" in
         artemis)
