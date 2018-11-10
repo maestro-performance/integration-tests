@@ -7,6 +7,7 @@ networks:
 services:
   broker:
     image: maestroperf/maestro-broker:edge
+    hostname: broker
     networks:
       - cluster
     ports:
