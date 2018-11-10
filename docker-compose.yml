@@ -12,6 +12,7 @@ services:
       - cluster
     ports:
       - "18161:8161"
+      - "1883:1883"
   worker:
     image: maestroperf/maestro-worker:edge
     networks:
@@ -38,15 +39,6 @@ services:
         - cluster
         - test
       depends_on:
-        - broker
-  client:
-      image: maestroperf/maestro-client:edge
-      networks:
-        - cluster
-      ports:
-        - "8000:8000"
-      depends_on:
-        - worker
         - broker
   reports:
     image: maestroperf/maestro-reports:edge
