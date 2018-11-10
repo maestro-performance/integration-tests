@@ -1,0 +1,14 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+
+
+os:
+  - linux
+
+language:
+  - java
+script: test.sh

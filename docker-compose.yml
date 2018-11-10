@@ -1,0 +1,63 @@
+version: '3.4'
+networks:
+    cluster:
+      driver: bridge
+    test:
+      driver: bridge
+services:
+  broker:
+    image: maestroperf/maestro-broker:edge
+    networks:
+      - cluster
+    ports:
+      - "18161:8161"
+  worker:
+    image: maestroperf/maestro-worker:edge
+    networks:
+      - cluster
+      - test
+    depends_on:
+      - broker
+      - sut
+  inspector:
+      image: maestroperf/maestro-inspector:edge
+      ports:
+        - "38000:8000"
+      networks:
+        - cluster
+        - test
+      depends_on:
+        - sut
+        - broker
+  agent:
+      image: maestroperf/maestro-agent:edge
+      ports:
+        - "48000:8000"
+      networks:
+        - cluster
+        - test
+      depends_on:
+        - broker
+  client:
+      image: maestroperf/maestro-client:edge
+      networks:
+        - cluster
+      ports:
+        - "8000:8000"
+      depends_on:
+        - worker
+        - broker
+  reports:
+    image: maestroperf/maestro-reports:edge
+    networks:
+      - cluster
+    ports:
+      - "6500:6500"
+    volumes:
+      - reports:/maestro
+    depends_on:
+      - broker
+
+volumes:
+  reports:
+
