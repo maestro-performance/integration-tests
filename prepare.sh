@@ -8,6 +8,7 @@ git clone https://github.com/maestro-performance/maestro-java.git -b devel
 mkdir -p suts
 cd suts &&  cp -Rv ../maestro-java/extra/docker-compose/maestro/suts/* .
 cp -Rv ../../suts/* .
-cd ..
+cd ../../docker
+make
 
 
