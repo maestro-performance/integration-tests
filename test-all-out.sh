@@ -2,17 +2,30 @@
 
 function cleanup() {
     echo "Cleaning up the SUT"
-    docker rmi -f maestro_sut  || true
+    docker rmi -f maestro_sut
+    if [[ $? != 0 ]] ; then
+        echo "Failed to remove the SUT image (ignoring ...)"
+    fi
 }
 
 
 function runTest() {
     docker-compose -f docker-compose.yml -f $1 up --scale worker=2 --scale agent=0 --scale inspector=0 -d
+    if [[ $? != 0 ]] ; then
+        echo "Mini-cluster setup failed"
+        exit 1
+    fi
+
+
     echo "Waiting 10s for the infra to come up"
     sleep 10s
 
     echo "Launching the test execution"
     docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Artemis 2.6.3" maestro-test-client /usr/bin/test-runner-all-out.sh
+    if [[ $? != 0 ]] ; then
+        echo "Test execution failed"
+        exit 1
+    fi
 
     echo "Waiting 30s for the system to quiesce and shutdown"
     sleep 30s
