@@ -73,6 +73,8 @@ function testRabbitMq() {
     cleanup
 }
 
+trap cleanup SIGTERM SIGINT
+
 case "${1}" in
         artemis)
                 testArtemis
