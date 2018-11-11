@@ -2,7 +2,7 @@
 
 function cleanup() {
     echo "Cleaning up the SUT"
-    docker rmi -f maestro_sut
+    docker rmi -f work_sut
     if [[ $? != 0 ]] ; then
         echo "Failed to remove the SUT image (ignoring ...)"
     fi
