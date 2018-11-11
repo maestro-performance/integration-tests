@@ -7,7 +7,6 @@ function cleanup() {
 
 
 function runTest() {
-    echo "Launching a SUT instance w/ Apache Artemis"
     docker-compose -f docker-compose.yml -f $1 up --scale worker=2 --scale agent=0 --scale inspector=0 -d
     echo "Waiting 10s for the infra to come up"
     sleep 10s
