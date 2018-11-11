@@ -1,73 +1,100 @@
 #!/bin/bash
 
 function cleanup() {
-    docker rmi -f maestro_sut  || true
+    echo "Cleaning up the SUT"
+    docker rmi -f maestro_sut
+    if [[ $? != 0 ]] ; then
+        echo "Failed to remove the SUT image (ignoring ...)"
+    fi
 }
 
-# MQ Light
-function testIbmMqLight() {
-    wget -c https://gist.githubusercontent.com/orpiske/43574edf7c6c3ef150550c70820c25b8/raw/21def540f911ac8bdbfe9bd899521e924a76c018/docker-ibmmqlight-compose.yml -O suts/docker-ibmmqlight-compose.yml
-    docker-compose -f docker-compose.yml -f suts/docker-ibmmqlight-compose.yml up --scale worker=2 --scale agent=0 --scale inspector=0 -d
-    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="IBM MQ Light" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
+function runTest() {
+    docker-compose -f docker-compose.yml -f $1 up --scale worker=2 --scale agent=0 --scale inspector=0 -d
+    if [[ $? != 0 ]] ; then
+        echo "Mini-cluster setup failed"
+        exit 1
+    fi
+
+
+    echo "Waiting 10s for the infra to come up"
+    sleep 10s
+
+    echo "Launching the test execution"
+    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="$2" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
+    if [[ $? != 0 ]] ; then
+        echo "Test execution failed"
+        exit 1
+    fi
+
+    echo "Waiting 30s for the system to quiesce and shutdown"
     sleep 30s
-    docker-compose -f docker-compose.yml -f suts/docker-ibmmqlight-compose.yml down
+
+    echo "Shutting down the Maestro mini-cluster"
+    docker-compose -f docker-compose.yml -f $1 down
     cleanup
 }
-
 
 # Artemis 2.6
 function testArtemis() {
-    docker-compose -f docker-compose.yml -f suts/docker-artemis-compose.yml up --scale worker=2 --scale agent=0 --scale inspector=0 -d
-    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Artemis 2.6.3" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
-    sleep 30s
-    docker-compose -f docker-compose.yml -f suts/docker-artemis-compose.yml down
-    cleanup
+    local productName="Apache Artemis 2.6.3"
+
+    echo "Launching a SUT instance w/ ${productName}"
+    runTest suts/docker-artemis-compose.yml "${productName}"
 }
 
 
-# ActiveMQ
+# MQ Light
+function testIbmMqLight() {
+    local productName="IBM MQ Light"
+
+    echo "Launching a SUT instance w/ ${productName}"
+    wget -c https://gist.githubusercontent.com/orpiske/43574edf7c6c3ef150550c70820c25b8/raw/21def540f911ac8bdbfe9bd899521e924a76c018/docker-ibmmqlight-compose.yml -O suts/docker-ibmmqlight-compose.yml
+
+    runTest suts/docker-ibmmqlight-compose.yml "${productName}"
+}
+
+# Apache ActiveMQ
 function testActiveMQ() {
-    docker-compose -f docker-compose.yml -f suts/docker-activemq-compose.yml up --scale worker=2 --scale agent=0 --scale inspector=0 -d
-    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="ActiveMQ 5.15.2" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
-    sleep 30s
-    docker-compose -f docker-compose.yml -f suts/docker-activemq-compose.yml down
-    cleanup
-}
+    local productName="Apache ActiveMQ 5.15.3"
 
+    echo "Launching a SUT instance w/ ${productName}"
+
+    runTest suts/docker-activemq-compose.yml "${productName}"
+}
 
 # Interconnect
 function testQpidDispatch() {
-    docker-compose -f docker-compose.yml -f suts/docker-interconnect-compose.yml up --scale worker=2 --scale agent=0 --scale inspector=0 -d
-    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Interconnect 1.4.0" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
-    sleep 90s
-    docker-compose -f docker-compose.yml -f suts/docker-interconnect-compose.yml down
-    cleanup
+    local productName="QPID Dispatch Router"
+
+    echo "Launching a SUT instance w/ ${productName}"
+    runTest suts/docker-interconnect-compose.yml "${productName}"
 }
 
-# QpidCpp
+# QpidCPP
 function testQpidCpp() {
+    local productName="QPid CPP Broker"
+
+    echo "Launching an experimental SUT instance w/ ${productName}"
     localDir="$(dirname $0)"
 
-    docker build -t maestro_test_rabbitmq ${localDir}/suts/rabbitmq/
-    docker-compose -f docker-compose.yml -f ${localDir}/suts/qpid/docker-compose.ymlup --scale worker=2 --scale agent=0 --scale inspector=0 -d
-    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="Qpid CPP" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
-    sleep 90s
-    docker-compose -f docker-compose.yml -f suts/docker-interconnect-compose.yml down
-    cleanup
-}
+    echo "Building the SUT image for the test"
+    docker build -t maestro_test_qpid ${localDir}/suts/qpid/
 
+    runTest ${localDir}/suts/qpid/docker-compose.yml "${productName}"
+}
 
 # RabbitMQ
 function testRabbitMq() {
+    local productName="RabbitMQ"
+
+    echo "Launching an experimental SUT instance w/ ${productName}"
+
     localDir="$(dirname $0)"
 
+    echo "Building the SUT image for the test"
     docker build -t maestro_test_rabbitmq ${localDir}/suts/rabbitmq/
-    docker-compose -f docker-compose.yml -f ${localDir}/suts/rabbitmq/docker-compose.yml up --scale worker=2 --scale agent=0 --scale inspector=0 -d
-    10s
-    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="RabbitMQ" -e SEND_RECEIVE_URL="amqp://sut:5672/test.performance.queue?protocol=RABBITAMQP" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
-    sleep 30s
-    docker-compose -f docker-compose.yml -f suts/docker-rabbitmq-compose.yml down
-    cleanup
+
+    runTest ${localDir}/suts/rabbitmq/docker-compose.yml "${productName}"
 }
 
 trap cleanup SIGTERM SIGINT
