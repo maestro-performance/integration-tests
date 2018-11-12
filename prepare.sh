@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p work
+mkdir -p work/results/{incremental,all-out}
 cd work
 cp ../test*.sh .
 cp ../docker*.yml .

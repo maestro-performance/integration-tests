@@ -21,11 +21,12 @@ function runTest() {
     sleep 10s
 
     echo "Launching the test execution"
-    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="$2" maestro-test-client /usr/bin/test-runner-all-out.sh
+    docker run -it -h maestro_client -v "$PWD"/results/all-out:/maestro/tests/results --network=work_cluster -e PRODUCT_NAME="$2" -e TEST_NAME="$3" maestro-test-client /usr/bin/test-runner-all-out.sh
     if [[ $? != 0 ]] ; then
         echo "Test execution failed"
         exit 1
     fi
+
 
     echo "Waiting 30s for the system to quiesce and shutdown"
     sleep 30s
@@ -40,7 +41,7 @@ function testArtemis() {
     local productName="Apache Artemis 2.6.3"
 
     echo "Launching a SUT instance w/ ${productName}"
-    runTest suts/docker-artemis-compose.yml "${productName}"
+    runTest suts/docker-artemis-compose.yml "${productName}" "all-out-artemis"
 }
 
 
@@ -51,7 +52,7 @@ function testIbmMqLight() {
     echo "Launching a SUT instance w/ ${productName}"
     wget -c https://gist.githubusercontent.com/orpiske/43574edf7c6c3ef150550c70820c25b8/raw/21def540f911ac8bdbfe9bd899521e924a76c018/docker-ibmmqlight-compose.yml -O suts/docker-ibmmqlight-compose.yml
 
-    runTest suts/docker-ibmmqlight-compose.yml "${productName}"
+    runTest suts/docker-ibmmqlight-compose.yml "${productName}" "all-out-ibm-mq-light"
 }
 
 # Apache ActiveMQ
@@ -60,7 +61,7 @@ function testActiveMQ() {
 
     echo "Launching a SUT instance w/ ${productName}"
 
-    runTest suts/docker-activemq-compose.yml "${productName}"
+    runTest suts/docker-activemq-compose.yml "${productName}" "all-out-activemq"
 }
 
 # Interconnect
@@ -68,7 +69,7 @@ function testQpidDispatch() {
     local productName="QPID Dispatch Router"
 
     echo "Launching a SUT instance w/ ${productName}"
-    runTest suts/docker-interconnect-compose.yml "${productName}"
+    runTest suts/docker-interconnect-compose.yml "${productName}" "all-out-qpid-dispatch-router"
 }
 
 # QpidCPP
@@ -81,7 +82,7 @@ function testQpidCpp() {
     echo "Building the SUT image for the test"
     docker build -t maestro_test_qpid ${localDir}/suts/qpid/
 
-    runTest ${localDir}/suts/qpid/docker-compose.yml "${productName}"
+    runTest ${localDir}/suts/qpid/docker-compose.yml "${productName}" "all-out-qpid-cpp"
 }
 
 # RabbitMQ
@@ -95,7 +96,7 @@ function testRabbitMq() {
     echo "Building the SUT image for the test"
     docker build -t maestro_test_rabbitmq ${localDir}/suts/rabbitmq/
 
-    runTest ${localDir}/suts/rabbitmq/docker-compose.yml "${productName}"
+    runTest ${localDir}/suts/rabbitmq/docker-compose.yml "${productName}" "all-out-rabbitmq"
 }
 
 trap cleanup SIGTERM SIGINT

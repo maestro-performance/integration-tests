@@ -20,7 +20,7 @@ function runTest() {
     sleep 10s
 
     echo "Launching the test execution"
-    docker run -it -h maestro_client -v maestro:/maestro --network=work_cluster -e PRODUCT_NAME="$2" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
+    docker run -it -h maestro_client -v "$PWD"/results/incremental:/maestro/tests/results --network=work_cluster -e PRODUCT_NAME="$2" -e TEST_NAME="$3" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     if [[ $? != 0 ]] ; then
         echo "Test execution failed"
         exit 1
@@ -39,7 +39,7 @@ function testArtemis() {
     local productName="Apache Artemis 2.6.3"
 
     echo "Launching a SUT instance w/ ${productName}"
-    runTest suts/docker-artemis-compose.yml "${productName}"
+    runTest suts/docker-artemis-compose.yml "${productName}" "incremental-artemis"
 }
 
 
@@ -50,7 +50,7 @@ function testIbmMqLight() {
     echo "Launching a SUT instance w/ ${productName}"
     wget -c https://gist.githubusercontent.com/orpiske/43574edf7c6c3ef150550c70820c25b8/raw/21def540f911ac8bdbfe9bd899521e924a76c018/docker-ibmmqlight-compose.yml -O suts/docker-ibmmqlight-compose.yml
 
-    runTest suts/docker-ibmmqlight-compose.yml "${productName}"
+    runTest suts/docker-ibmmqlight-compose.yml "${productName}" "incremental-ibm-mq-light"
 }
 
 # Apache ActiveMQ
@@ -59,7 +59,7 @@ function testActiveMQ() {
 
     echo "Launching a SUT instance w/ ${productName}"
 
-    runTest suts/docker-activemq-compose.yml "${productName}"
+    runTest suts/docker-activemq-compose.yml "${productName}" "incremental-activemq"
 }
 
 # Interconnect
@@ -67,14 +67,14 @@ function testQpidDispatch() {
     local productName="QPID Dispatch Router"
 
     echo "Launching a SUT instance w/ ${productName}"
-    runTest suts/docker-interconnect-compose.yml "${productName}"
+    runTest suts/docker-interconnect-compose.yml "${productName}" "incremental-qpid-dispatch-router"
 }
 
 # QpidCPP
 function testQpidCpp() {
     local productName="QPid CPP Broker"
 
-    echo "Launching an experimental SUT instance w/ ${productName}"
+    echo "Launching an experimental SUT instance w/ ${productName}" "incremental-qpid-cpp"
     localDir="$(dirname $0)"
 
     echo "Building the SUT image for the test"
@@ -94,7 +94,7 @@ function testRabbitMq() {
     echo "Building the SUT image for the test"
     docker build -t maestro_test_rabbitmq ${localDir}/suts/rabbitmq/
 
-    runTest ${localDir}/suts/rabbitmq/docker-compose.yml "${productName}"
+    runTest ${localDir}/suts/rabbitmq/docker-compose.yml "${productName}" "incremental-rabbitmq"
 }
 
 trap cleanup SIGTERM SIGINT
