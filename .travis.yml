@@ -11,4 +11,4 @@ os:
 
 language:
   - java
-script: cd work && ./test.sh
+script: cd work && ./test-all-out.sh all
