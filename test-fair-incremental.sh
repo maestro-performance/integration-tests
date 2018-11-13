@@ -20,7 +20,7 @@ function runTest() {
     sleep 10s
 
     echo "Launching the test execution"
-    docker run -it -h maestro_client -v "$PWD"/results/incremental:/maestro/tests/results --network=work_cluster \
+    docker run -h maestro_client -v "$PWD"/results/incremental:/maestro/tests/results --network=work_cluster \
         -e PRODUCT_NAME="$2" -e TEST_XUNIT_NAME="$3"  -e SEND_RECEIVE_URL_OPTS="$4" \
         maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     if [[ $? != 0 ]] ; then
