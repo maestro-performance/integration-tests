@@ -20,7 +20,9 @@ function runTest() {
     sleep 10s
 
     echo "Launching the test execution"
-    docker run -it -h maestro_client -v "$PWD"/results/incremental:/maestro/tests/results --network=work_cluster -e PRODUCT_NAME="$2" -e TEST_XUNIT_NAME="$3" maestro-test-client /usr/bin/test-runner-fair-incremental.sh
+    docker run -it -h maestro_client -v "$PWD"/results/incremental:/maestro/tests/results --network=work_cluster \
+        -e PRODUCT_NAME="$2" -e TEST_XUNIT_NAME="$3"  -e SEND_RECEIVE_URL_OPTS="$4" \
+        maestro-test-client /usr/bin/test-runner-fair-incremental.sh
     if [[ $? != 0 ]] ; then
         echo "Test execution failed"
         exit 1
@@ -67,7 +69,7 @@ function testQpidDispatch() {
     local productName="QPID Dispatch Router"
 
     echo "Launching a SUT instance w/ ${productName}"
-    runTest suts/docker-interconnect-compose.yml "${productName}" "incremental-qpid-dispatch-router"
+    runTest suts/docker-interconnect-compose.yml "${productName}" "incremental-qpid-dispatch-router" "jms.closeTimeout=500&jms.requestTimeout=2000&jms.sendTimeout=1000"
 }
 
 # QpidCPP
