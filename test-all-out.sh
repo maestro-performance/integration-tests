@@ -23,7 +23,7 @@ function runTest() {
     echo "Launching the test execution"
     docker run -h maestro_client -v "$PWD"/results/all-out:/maestro/tests/results --network=work_cluster \
         -e PRODUCT_NAME="$2" -e TEST_XUNIT_NAME="$3" -e SEND_RECEIVE_URL_OPTS="$4" \
-            maestro-test-client /usr/bin/test-runner-all-out.sh
+            maestro-test-client /usr/bin/test-runner.sh amqp/all-out
     if [[ $? != 0 ]] ; then
         echo "Test execution failed"
         exit 1

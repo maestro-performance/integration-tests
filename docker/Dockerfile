@@ -1,4 +1,5 @@
 FROM maestroperf/maestro-client:edge as maestro-test-client
-ADD test-runner-all-out.sh /usr/bin/test-runner-all-out.sh
-ADD test-runner-fair-incremental.sh /usr/bin/test-runner-fair-incremental.sh
+RUN mkdir -p /etc/maestro/test-profiles
+ADD test-profiles /etc/maestro/test-profiles
+ADD test-runner.sh /usr/bin/test-runner.sh
 VOLUME /maestro/tests/results
