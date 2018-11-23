@@ -12,7 +12,7 @@ fi
 
 echo "Running ${TEST_DESCRIPTION}"
 /opt/maestro/maestro-cli/bin/maestro-cli maestro -m ${MAESTRO_BROKER} -c ping
-/opt/maestro/maestro-cli/bin/maestro-cli exec -s /opt/maestro/maestro-cli/scripts/singlepoint/FixedRateTest.groovy
+/opt/maestro/maestro-cli/bin/maestro-cli exec -s /opt/maestro/maestro-cli/scripts/singlepoint/$2
 
 trap cleanup SIGTERM SIGINT
 

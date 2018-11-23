@@ -24,7 +24,7 @@ function runTest() {
         -e PRODUCT_NAME="$2" -e TEST_XUNIT_NAME="$3" \
         -e TEST_XUNIT_DIR=${PWD}/results/incremental \
         -e SEND_RECEIVE_URL_OPTS="$4" \
-        maestro-test-client /usr/bin/test-runner.sh amqp/fair-incremental
+        maestro-test-client /usr/bin/test-runner.sh amqp/fair-incremental FairIncrementalTest.groovy
     if [[ $? != 0 ]] ; then
         echo "Test execution failed"
         exit 1
