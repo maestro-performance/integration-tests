@@ -19,10 +19,12 @@ echo "########### ENV START ###########"
 env 
 echo "########### ENV END ###########"
 
+echo "Setting up cleanup trap"
+trap cleanup SIGTERM SIGINT
+
 echo "Running ${TEST_DESCRIPTION}"
 /opt/maestro/maestro-cli/bin/maestro-cli maestro -m ${MAESTRO_BROKER} -c ping
 /opt/maestro/maestro-cli/bin/maestro-cli exec -s /opt/maestro/maestro-cli/scripts/singlepoint/$2
 
-trap cleanup SIGTERM SIGINT
 
 exit 0
