@@ -2,6 +2,7 @@
 
 function cleanup() {
     /opt/maestro/maestro-cli/bin/maestro-cli maestro -m ${MAESTRO_BROKER} -c stop
+    /opt/maestro/maestro-cli/bin/maestro-cli maestro -m ${MAESTRO_BROKER} -c unassign
 }
 
 if [[ ! -f /etc/maestro/test-profiles/$1.conf ]] ; then
