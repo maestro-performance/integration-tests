@@ -1,7 +1,7 @@
 all: image
 
-image:
-	docker build -t maestro-test-client .
-
 clean:
-	docker rmi -f maestro-test-client
+	docker rmi -f maestro-test-client || true
+
+image: clean
+	docker build -t maestro-test-client .
