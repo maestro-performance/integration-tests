@@ -6,7 +6,7 @@ function cleanup() {
 }
 
 if [[ ! -f /etc/maestro/test-profiles/$1.conf ]] ; then
-    echo "The test configuratoin file is missing. Running with default parameters"
+    echo "The test configuration file is missing. Running with default parameters"
 else
     source /etc/maestro/test-profiles/$1.conf
 fi
@@ -17,7 +17,7 @@ if [[ ! -z "${SEND_RECEIVE_URL_OPTS}" ]] ; then
 fi
 
 echo "########### ENV START ###########"
-env 
+env
 echo "########### ENV END ###########"
 
 echo "Setting up cleanup trap"
