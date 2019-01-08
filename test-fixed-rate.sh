@@ -24,7 +24,7 @@ function runTest() {
     docker run -h maestro_client -v "$PWD"/results/fixed-rate:/maestro/tests/results --network=work_cluster \
         -e PRODUCT_NAME="$2" -e TEST_XUNIT_NAME="$3" \
         -e SEND_RECEIVE_URL_OPTS="$4" \
-            maestro-test-client /usr/bin/test-runner.sh fixed-rate FixedRateTest.groovy
+            maestro-test-client /usr/bin/test-runner.sh amqp/fixed-rate FixedRateTest.groovy
     if [[ $? != 0 ]] ; then
         echo "Test execution failed"
         exit 1
