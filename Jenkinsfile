@@ -24,12 +24,17 @@ node("master") {
                     sh 'cd integration-tests && ./prepare.sh'
                 }
                 
+                
                 stage('All Out Tests') {
                     sh "cd $WORKSPACE/integration-tests/work && ./test-all-out.sh all"
                 }
                 
                 stage('Incremental Tests') {
                     sh "cd $WORKSPACE/integration-tests/work && ./test-fair-incremental.sh all"
+                }
+
+                stage('Fixed Rate Tests') {
+                    sh "cd $WORKSPACE/integration-tests/work && ./test-fixed-rate.sh all"
                 }
                 
                 xunit testTimeMargin: '7200000',
