@@ -36,6 +36,10 @@ node("master") {
                 stage('Fixed Rate Tests') {
                     sh "cd $WORKSPACE/integration-tests/work && ./test-fixed-rate.sh all"
                 }
+
+                stage('Warmed Up Fixed Rate Tests') {
+                    sh "cd $WORKSPACE/integration-tests/work && ./test-fixed-rate.sh all"
+                }
                 
                 xunit testTimeMargin: '7200000',
                     thresholds: [
