@@ -44,7 +44,7 @@ function testArtemis() {
     local productName="Apache Artemis 2.6.3"
 
     echo "Launching a SUT instance w/ ${productName}"
-    runTest suts/docker-artemis-compose.yml "${productName}" "all-out-artemis"
+    runTest suts/docker-artemis-compose.yml "${productName}" "fixed-rate-artemis"
 }
 
 
@@ -55,7 +55,7 @@ function testIbmMqLight() {
     echo "Launching a SUT instance w/ ${productName}"
     wget -c https://gist.githubusercontent.com/orpiske/43574edf7c6c3ef150550c70820c25b8/raw/21def540f911ac8bdbfe9bd899521e924a76c018/docker-ibmmqlight-compose.yml -O suts/docker-ibmmqlight-compose.yml
 
-    runTest suts/docker-ibmmqlight-compose.yml "${productName}" "all-out-ibm-mq-light"
+    runTest suts/docker-ibmmqlight-compose.yml "${productName}" "fixed-rate-ibm-mq-light"
 }
 
 # Apache ActiveMQ
@@ -64,7 +64,7 @@ function testActiveMQ() {
 
     echo "Launching a SUT instance w/ ${productName}"
 
-    runTest suts/docker-activemq-compose.yml "${productName}" "all-out-activemq"
+    runTest suts/docker-activemq-compose.yml "${productName}" "fixed-rate-activemq"
 }
 
 # Interconnect
@@ -72,7 +72,7 @@ function testQpidDispatch() {
     local productName="QPID Dispatch Router"
 
     echo "Launching a SUT instance w/ ${productName}"
-    runTest suts/docker-interconnect-compose.yml "${productName}" "all-out-qpid-dispatch-router" "jms.closeTimeout=500&jms.requestTimeout=2000&jms.sendTimeout=1000"
+    runTest suts/docker-interconnect-compose.yml "${productName}" "fixed-rate-qpid-dispatch-router" "jms.closeTimeout=500&jms.requestTimeout=2000&jms.sendTimeout=1000"
 }
 
 # QpidCPP
@@ -85,7 +85,7 @@ function testQpidCpp() {
     echo "Building the SUT image for the test"
     docker build -t maestro_test_qpid ${localDir}/suts/qpid/
 
-    runTest ${localDir}/suts/qpid/docker-compose.yml "${productName}" "all-out-qpid-cpp"
+    runTest ${localDir}/suts/qpid/docker-compose.yml "${productName}" "fixed-rate-qpid-cpp"
 }
 
 # RabbitMQ
@@ -99,7 +99,7 @@ function testRabbitMq() {
     echo "Building the SUT image for the test"
     docker build -t maestro_test_rabbitmq ${localDir}/suts/rabbitmq/
 
-    runTest ${localDir}/suts/rabbitmq/docker-compose.yml "${productName}" "all-out-rabbitmq"
+    runTest ${localDir}/suts/rabbitmq/docker-compose.yml "${productName}" "fixed-rate-rabbitmq"
 }
 
 trap cleanup SIGTERM SIGINT
